@@ -34,6 +34,7 @@ export function IdeaForm() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log("'Generate' button clicked. Form submission started.");
     setIsSubmitting(true);
     try {
       const result = await createLandingPage(values);

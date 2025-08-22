@@ -13,6 +13,7 @@ const createPageSchema = z.object({
 });
 
 export async function createLandingPage(values: z.infer<typeof createPageSchema>) {
+  console.log('Entering createLandingPage function.');
   const validatedFields = createPageSchema.safeParse(values);
   if (!validatedFields.success) {
     return { error: 'Invalid input.' };
@@ -21,7 +22,9 @@ export async function createLandingPage(values: z.infer<typeof createPageSchema>
   try {
     const { productDescription, email } = validatedFields.data;
 
+    console.log('Calling generateLandingPageContent with productDescription:', productDescription);
     const content = await generateLandingPageContent({ productDescription });
+    console.log('Received result from generateLandingPageContent:', content);
     const { headline, subHeadline } = content;
 
     if (!headline || !subHeadline) {
@@ -53,9 +56,12 @@ export async function createLandingPage(values: z.infer<typeof createPageSchema>
     revalidatePath(`/p/${slug}/admin`);
 
     return { slug };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating landing page:', error);
     return { error: 'An unexpected error occurred. Could not create landing page.' };
+  }
+  finally {
+    console.log('Exiting createLandingPage function.');
   }
 }
 

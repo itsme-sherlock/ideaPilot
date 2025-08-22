@@ -31,8 +31,10 @@ export type GenerateLandingPageContentOutput = z.infer<
 export async function generateLandingPageContent(
   input: GenerateLandingPageContentInput
 ): Promise<GenerateLandingPageContentOutput> {
+  console.log('INFO: Entering generateLandingPageContent');
   return generateLandingPageContentFlow(input);
 }
+
 
 const generateLandingPageContentPrompt = ai.definePrompt({
   name: 'generateLandingPageContentPrompt',
@@ -45,6 +47,7 @@ Product Description: {{{productDescription}}}
 Headline:`, // Removed example text.
 });
 
+console.log('INFO: Defining generateLandingPageContentFlow');
 const generateLandingPageContentFlow = ai.defineFlow(
   {
     name: 'generateLandingPageContentFlow',
@@ -52,7 +55,11 @@ const generateLandingPageContentFlow = ai.defineFlow(
     outputSchema: GenerateLandingPageContentOutputSchema,
   },
   async input => {
+    console.log('INFO: Inside generateLandingPageContentFlow async function');
+    console.log('INFO: Calling generateLandingPageContentPrompt');
     const {output} = await generateLandingPageContentPrompt(input);
+    console.log('INFO: Received output from generateLandingPageContentPrompt');
     return output!;
   }
 );
+console.log('INFO: generateLandingPageContentFlow defined');
