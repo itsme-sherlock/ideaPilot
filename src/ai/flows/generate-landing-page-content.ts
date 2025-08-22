@@ -1,65 +1,40 @@
-'use server';
-
-/**
- * @fileOverview Generates content for a landing page based on a product idea.
- *
- * - generateLandingPageContent - A function that generates the landing page content.
- * - GenerateLandingPageContentInput - The input type for the generateLandingPageContent function.
- * - GenerateLandingPageContentOutput - The return type for the generateLandingPageContent function.
- */
-
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { ai } from '@/ai/genkit';
+import { z } from 'genkit';
 
 const GenerateLandingPageContentInputSchema = z.object({
-  productDescription: z
-    .string()
-    .describe('A description of the product or idea for the landing page.'),
+  productDescription: z.string().describe('A description of the product or idea.'),
 });
-export type GenerateLandingPageContentInput = z.infer<
-  typeof GenerateLandingPageContentInputSchema
->;
 
 const GenerateLandingPageContentOutputSchema = z.object({
-  headline: z.string().describe('The generated headline for the landing page.'),
-  subHeadline: z.string().describe('The generated sub-headline for the landing page.'),
+  headline: z.string().describe('The generated headline.'),
+  subHeadline: z.string().describe('The generated sub-headline.'),
 });
-export type GenerateLandingPageContentOutput = z.infer<
-  typeof GenerateLandingPageContentOutputSchema
->;
-
-export async function generateLandingPageContent(
-  input: GenerateLandingPageContentInput
-): Promise<GenerateLandingPageContentOutput> {
-  console.log('INFO: Entering generateLandingPageContent');
-  return generateLandingPageContentFlow(input);
-}
-
 
 const generateLandingPageContentPrompt = ai.definePrompt({
   name: 'generateLandingPageContentPrompt',
-  input: {schema: GenerateLandingPageContentInputSchema},
-  output: {schema: GenerateLandingPageContentOutputSchema},
-  prompt: `You are a marketing expert who specializes in creating compelling landing page content. Generate a short and attention-grabbing headline and sub-headline for a landing page based on the following product description:
+  input: { schema: GenerateLandingPageContentInputSchema },
+  output: { schema: GenerateLandingPageContentOutputSchema },
+  prompt: `You are a marketing expert. Generate a compelling headline and sub-headline for:
 
 Product Description: {{{productDescription}}}
 
-Headline:`, // Removed example text.
+Headline:`,
 });
 
-console.log('INFO: Defining generateLandingPageContentFlow');
-const generateLandingPageContentFlow = ai.defineFlow(
+export const generateLandingPageContentFlow = ai.defineFlow(
   {
     name: 'generateLandingPageContentFlow',
     inputSchema: GenerateLandingPageContentInputSchema,
     outputSchema: GenerateLandingPageContentOutputSchema,
   },
-  async input => {
-    console.log('INFO: Inside generateLandingPageContentFlow async function');
-    console.log('INFO: Calling generateLandingPageContentPrompt');
-    const {output} = await generateLandingPageContentPrompt(input);
-    console.log('INFO: Received output from generateLandingPageContentPrompt');
-    return output!;
+  async (input) => {
+    const result = await generateLandingPageContentPrompt(input);
+    return result.output!;
   }
 );
-console.log('INFO: generateLandingPageContentFlow defined');
+
+export async function generateLandingPageContent(
+  input: z.infer<typeof GenerateLandingPageContentInputSchema>
+) {
+  return await generateLandingPageContentFlow(input);
+}

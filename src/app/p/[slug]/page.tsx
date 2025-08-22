@@ -1,49 +1,56 @@
-import { collection, query, where, getDocs, limit } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { notFound } from 'next/navigation';
-import { SignupForm } from '@/components/signup-form';
-import { FeedbackWidget } from '@/components/feedback-widget';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { notFound } from "next/navigation";
+import { SignupForm } from "@/components/signup-form";
+import { FeedbackWidget } from "@/components/feedback-widget";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { createClient } from "@supabase/supabase-js";
 
-type PageProps = {
-  params: { slug: string };
+// --- Types ---
+type PageData = {
+  id: string;
+  headline: string;
+  sub_headline: string | null;
 };
 
-async function getPageData(slug: string) {
-  try {
-    const pagesRef = collection(db, 'pages');
-    const q = query(pagesRef, where('slug', '==', slug), limit(1));
-    const querySnapshot = await getDocs(q);
+// --- Supabase Client ---
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
-    if (querySnapshot.empty) {
-      return null;
-    }
+// --- Data Fetcher ---
+async function getPageData(slug: string): Promise<PageData | null> {
+  const { data, error } = await supabase
+    .from("pages")
+    .select("id, headline, sub_headline")
+    .eq("slug", slug)
+    .single();
 
-    const pageDoc = querySnapshot.docs[0];
-    return {
-      id: pageDoc.id,
-      ...pageDoc.data()
-    } as { id: string; headline: string; subHeadline: string };
-  } catch (error) {
-    console.error("Firebase error:", error);
+  if (error || !data) {
+    console.error("Supabase error:", error);
     return null;
   }
+
+  return data;
 }
 
-export default async function PublicPage({ params }: PageProps) {
-  const pageData = await getPageData(params.slug);
+// --- Component ---
+export default async function PublicPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params; // ✅ Await params for App Router
+  const pageData = await getPageData(slug);
 
-  if (!pageData) {
-    notFound();
-  }
-  
+  if (!pageData) notFound();
+
   return (
     <div className="container mx-auto max-w-3xl px-4 py-16 text-center">
       <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-primary mb-4 font-headline">
         {pageData.headline}
       </h1>
       <p className="text-xl md:text-2xl text-muted-foreground mb-12">
-        {pageData.subHeadline}
+        {pageData.sub_headline || ""}
       </p>
 
       <div className="space-y-12">

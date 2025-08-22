@@ -1,13 +1,25 @@
-import { collection, query, where, getDocs, limit, orderBy } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { notFound } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Link } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { CopyButton } from '@/components/copy-button';
+import { notFound } from "next/navigation";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Link } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { CopyButton } from "@/components/copy-button";
 
+// --- Types ---
 type AdminPageProps = {
   params: { slug: string };
 };
@@ -15,84 +27,112 @@ type AdminPageProps = {
 type PageData = {
   id: string;
   headline: string;
-  creatorEmail: string;
+  creator_email: string;
   idea: string;
 };
 
 type Signup = {
   id: string;
   email: string;
-  createdAt: Date;
+  created_at: string;
 };
 
 type Feedback = {
   id: string;
-  response: 'yes' | 'no';
-  comment: string;
-  createdAt: Date;
+  response: "yes" | "no";
+  comment: string | null;
+  created_at: string;
 };
 
-async function getAdminData(slug: string) {
-  try {
-    const pagesRef = collection(db, 'pages');
-    const q = query(pagesRef, where('slug', '==', slug), limit(1));
-    const pageSnapshot = await getDocs(q);
+import { createClient } from "@supabase/supabase-js";
 
-    if (pageSnapshot.empty) return null;
+// --- Supabase Client ---
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
-    const pageDoc = pageSnapshot.docs[0];
-    const pageId = pageDoc.id;
+// --- Data Fetcher ---
+/**
+ * Fetches the page data, signups, and feedback for the given slug.
+ * @param slug The slug of the page.
+ * @returns The page data, signups, and feedback.
+ */
+async function getAdminData(slug: string): Promise<{
+  page: PageData;
+  signups: Signup[];
+  feedback: Feedback[];
+} | null> {
+  // 1. Page
+  const { data: page, error: pageError } = await supabase
+    .from("pages")
+    .select("id, headline, idea, creator_email")
+    .eq("slug", slug)
+    .single();
 
-    const signupsRef = collection(db, 'pages', pageId, 'signups');
-    const signupsQuery = query(signupsRef, orderBy('createdAt', 'desc'));
-    const signupsSnapshot = await getDocs(signupsQuery);
-    const signups = signupsSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      createdAt: doc.data().createdAt?.toDate()
-    })) as Signup[];
-
-    const feedbackRef = collection(db, 'pages', pageId, 'feedback');
-    const feedbackQuery = query(feedbackRef, orderBy('createdAt', 'desc'));
-    const feedbackSnapshot = await getDocs(feedbackQuery);
-    const feedback = feedbackSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      createdAt: doc.data().createdAt?.toDate()
-    })) as Feedback[];
-
-    return {
-      page: { id: pageId, ...pageDoc.data() } as PageData,
-      signups,
-      feedback
-    };
-  } catch(e) {
-    console.error(e)
-    return null
+  if (pageError || !page) {
+    console.error("Page fetch error:", pageError);
+    return null;
   }
+
+  // 2. Signups
+  const { data: signups, error: signupsError } = await supabase
+    .from("signups")
+    .select("id, email, created_at")
+    .eq("page_id", page.id)
+    .order("created_at", { ascending: false });
+
+  if (signupsError) console.error("Signups fetch error:", signupsError);
+
+  // 3. Feedback
+  const { data: feedback, error: feedbackError } = await supabase
+    .from("feedback")
+    .select("id, response, comment, created_at")
+    .eq("page_id", page.id)
+    .order("created_at", { ascending: false });
+
+  if (feedbackError) console.error("Feedback fetch error:", feedbackError);
+
+  return {
+    page,
+    signups: signups || [],
+    feedback: feedback || [],
+  };
 }
 
-export default async function AdminPage({ params }: AdminPageProps) {
-  const data = await getAdminData(params.slug);
+// --- Component ---
+/**
+ * The admin page component.
+ * @param props The props for the component.
+ */
+export default async function AdminPage(props: AdminPageProps) {
+  const { slug } = props.params;
 
+  const data = await getAdminData(slug);
   if (!data) notFound();
 
   const { page, signups, feedback } = data;
-  
-  const publicUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:9002'}/p/${params.slug}`;
+
+  const publicUrl = `${
+    process.env.NEXT_PUBLIC_APP_URL || "http://localhost:9002"
+  }/p/${slug}`;
   const adminUrl = `${publicUrl}/admin`;
 
   return (
     <div className="container mx-auto max-w-4xl px-4 py-12">
+      {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold font-headline">{page.headline}</h1>
         <p className="text-muted-foreground">Admin Dashboard</p>
       </div>
 
+      {/* Links + Page Info */}
       <div className="grid gap-6 md:grid-cols-2 mb-8">
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2"><Link className="h-5 w-5"/> Your Links</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Link className="h-5 w-5" /> Your Links
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
@@ -111,18 +151,27 @@ export default async function AdminPage({ params }: AdminPageProps) {
             </div>
           </CardContent>
         </Card>
+
         <Card>
           <CardHeader>
             <CardTitle>Page Info</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
-            <p><strong className="text-muted-foreground">Idea:</strong> {page.idea}</p>
-            <p><strong className="text-muted-foreground">Creator:</strong> {page.creatorEmail}</p>
+            <p>
+              <strong className="text-muted-foreground">Idea:</strong>{" "}
+              {page.idea}
+            </p>
+            <p>
+              <strong className="text-muted-foreground">Creator:</strong>{" "}
+              {page.creator_email}
+            </p>
           </CardContent>
         </Card>
       </div>
-      
+
+      {/* Signups + Feedback */}
       <div className="space-y-8">
+        {/* Signups */}
         <Card>
           <CardHeader>
             <CardTitle>Email Signups ({signups.length})</CardTitle>
@@ -137,11 +186,21 @@ export default async function AdminPage({ params }: AdminPageProps) {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {signups.length === 0 && <TableRow><TableCell colSpan={2} className="text-center">No signups yet.</TableCell></TableRow>}
-                {signups.map(s => (
+                {signups.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={2} className="text-center">
+                      No signups yet.
+                    </TableCell>
+                  </TableRow>
+                )}
+                {signups.map((s) => (
                   <TableRow key={s.id}>
                     <TableCell className="font-medium">{s.email}</TableCell>
-                    <TableCell className="text-right">{s.createdAt?.toLocaleDateString()}</TableCell>
+                    <TableCell className="text-right">
+                      {s.created_at
+                        ? new Date(s.created_at).toLocaleDateString()
+                        : "-"}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -149,6 +208,7 @@ export default async function AdminPage({ params }: AdminPageProps) {
           </CardContent>
         </Card>
 
+        {/* Feedback */}
         <Card>
           <CardHeader>
             <CardTitle>Feedback ({feedback.length})</CardTitle>
@@ -164,16 +224,38 @@ export default async function AdminPage({ params }: AdminPageProps) {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {feedback.length === 0 && <TableRow><TableCell colSpan={3} className="text-center">No feedback yet.</TableCell></TableRow>}
-                {feedback.map(f => (
+                {feedback.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={3} className="text-center">
+                      No feedback yet.
+                    </TableCell>
+                  </TableRow>
+                )}
+                {feedback.map((f) => (
                   <TableRow key={f.id}>
                     <TableCell>
-                      <Badge className={f.response === 'yes' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'}>
+                      <Badge
+                        className={
+                          f.response === "yes"
+                            ? "bg-green-600 hover:bg-green-700"
+                            : "bg-red-600 hover:bg-red-700"
+                        }
+                      >
                         {f.response}
                       </Badge>
                     </TableCell>
-                    <TableCell>{f.comment || <span className="text-muted-foreground italic">No comment</span>}</TableCell>
-                    <TableCell className="text-right">{f.createdAt?.toLocaleDateString()}</TableCell>
+                    <TableCell>
+                      {f.comment || (
+                        <span className="text-muted-foreground italic">
+                          No comment
+                        </span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {f.created_at
+                        ? new Date(f.created_at).toLocaleDateString()
+                        : "-"}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -184,3 +266,4 @@ export default async function AdminPage({ params }: AdminPageProps) {
     </div>
   );
 }
+

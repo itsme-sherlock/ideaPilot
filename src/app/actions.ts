@@ -1,117 +1,169 @@
 'use server';
 
 import { z } from 'zod';
-import { addDoc, collection, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
 import { generateLandingPageContent } from '@/ai/flows/generate-landing-page-content';
 import { slugify } from '@/lib/utils';
 import { revalidatePath } from 'next/cache';
+import { createClient } from '@/lib/supabase/server';
+
+// -------------------------
+// SCHEMAS
+// -------------------------
 
 const createPageSchema = z.object({
-  productDescription: z.string().min(10),
-  email: z.string().email(),
+  productDescription: z.string().min(10, 'Description must be at least 10 characters'),
+  email: z.string().email('Please enter a valid email'),
 });
+
+const addSignupSchema = z.object({
+  email: z.string().email('Invalid email'),
+  pageId: z.string().min(1),
+});
+
+const addFeedbackSchema = z.object({
+  response: z.enum(['yes', 'no']),
+  comment: z.string().optional(),
+  pageId: z.string().min(1),
+});
+
+// -------------------------
+// MAIN ACTION: Create Landing Page
+// -------------------------
 
 export async function createLandingPage(values: z.infer<typeof createPageSchema>) {
   console.log('Entering createLandingPage function.');
   const validatedFields = createPageSchema.safeParse(values);
   if (!validatedFields.success) {
+    console.error('Validation failed:', validatedFields.error.flatten().fieldErrors);
     return { error: 'Invalid input.' };
   }
 
+  const { productDescription, email } = validatedFields.data;
+  const supabase = createClient();
+
   try {
-    const { productDescription, email } = validatedFields.data;
-
-    console.log('Calling generateLandingPageContent with productDescription:', productDescription);
+    console.log('Calling AI to generate content for:', productDescription);
     const content = await generateLandingPageContent({ productDescription });
-    console.log('Received result from generateLandingPageContent:', content);
-    const { headline, subHeadline } = content;
+    //commenting the code to save api call
+    // const content = { headline: 'Headline', subHeadline: 'Subheadline' };
+    console.log('AI returned:', content);
 
+    const { headline, subHeadline } = content;
     if (!headline || !subHeadline) {
       return { error: 'Failed to generate content. Please try again.' };
     }
-    
-    let slug = slugify(headline);
-    const pagesRef = collection(db, 'pages');
-    let q = query(pagesRef, where('slug', '==', slug));
-    let querySnapshot = await getDocs(q);
-    let counter = 1;
-    while (!querySnapshot.empty) {
-        slug = `${slugify(headline)}-${counter}`;
-        q = query(pagesRef, where('slug', '==', slug));
-        querySnapshot = await getDocs(q);
-        counter++;
-    }
 
-    await addDoc(pagesRef, {
+    // Generate unique slug
+    let slug = slugify(headline);
+    let counter = 1;
+
+    console.log('Checking slug availability:', slug);
+    let { data: existing } = await supabase
+      .from('pages')
+      .select('slug')
+      .eq('slug', slug)
+      .maybeSingle();
+
+    while (existing) {
+      console.log(`Slug "${slug}" taken. Trying next...`);
+      slug = `${slugify(headline)}-${counter}`;
+      const { data: nextData } = await supabase
+        .from('pages')
+        .select('slug')
+        .eq('slug', slug)
+        .maybeSingle();
+      existing = nextData;
+      counter++;
+    }
+    console.log('Final slug:', slug);
+
+    // Insert into Supabase
+    const now = new Date().toISOString();
+    console.log('Inserting new page into Supabase:', { headline, subHeadline, slug, email });
+
+    const { error: insertError } = await supabase.from('pages').insert({
       idea: productDescription,
-      creatorEmail: email,
+      creator_email: email,
       headline,
-      subHeadline,
+      sub_headline: subHeadline,
       slug,
-      createdAt: serverTimestamp(),
+      created_at: now,
     });
 
+    if (insertError) {
+      console.error('Supabase insert error:', insertError);
+      return { error: 'Could not save landing page.' };
+    }
+
+    // Revalidate dynamic routes
     revalidatePath(`/p/${slug}`);
     revalidatePath(`/p/${slug}/admin`);
 
     return { slug };
   } catch (error: any) {
-    console.error('Error creating landing page:', error);
+    console.error('Error in createLandingPage:', error);
     return { error: 'An unexpected error occurred. Could not create landing page.' };
-  }
-  finally {
+  } finally {
     console.log('Exiting createLandingPage function.');
   }
 }
 
-const addSignupSchema = z.object({
-  email: z.string().email(),
-  pageId: z.string(),
-});
+// -------------------------
+// ACTION: Add Email Signup
+// -------------------------
 
 export async function addSignup(values: z.infer<typeof addSignupSchema>) {
-  const validatedFields = addSignupSchema.safeParse(values);
-  if (!validatedFields.success) {
+  const validated = addSignupSchema.safeParse(values);
+  if (!validated.success) {
     return { error: 'Invalid input.' };
   }
-  const { email, pageId } = validatedFields.data;
-  
+
+  const { email, pageId } = validated.data;
+  const supabase = createClient();
+
   try {
-    await addDoc(collection(db, 'pages', pageId, 'signups'), {
+    const { error } = await supabase.from('signups').insert({
+      page_id: pageId,
       email,
-      createdAt: serverTimestamp(),
+      created_at: new Date().toISOString(),
     });
+
+    if (error) throw error;
+
     revalidatePath(`/p/[slug]/admin`, 'page');
     return { success: 'Thank you for signing up!' };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error adding signup:', error);
     return { error: 'Could not add signup. Please try again.' };
   }
 }
 
-const addFeedbackSchema = z.object({
-  response: z.enum(['yes', 'no']),
-  comment: z.string().optional(),
-  pageId: z.string(),
-});
+// -------------------------
+// ACTION: Add Feedback
+// -------------------------
 
 export async function addFeedback(values: z.infer<typeof addFeedbackSchema>) {
-  const validatedFields = addFeedbackSchema.safeParse(values);
-  if (!validatedFields.success) {
+  const validated = addFeedbackSchema.safeParse(values);
+  if (!validated.success) {
     return { error: 'Invalid input.' };
   }
-  const { response, comment, pageId } = validatedFields.data;
+
+  const { response, comment, pageId } = validated.data;
+  const supabase = createClient();
 
   try {
-    await addDoc(collection(db, 'pages', pageId, 'feedback'), {
+    const { error } = await supabase.from('feedback').insert({
+      page_id: pageId,
       response,
       comment: comment || '',
-      createdAt: serverTimestamp(),
+      created_at: new Date().toISOString(),
     });
+
+    if (error) throw error;
+
     revalidatePath(`/p/[slug]/admin`, 'page');
     return { success: 'Thank you for your feedback!' };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error adding feedback:', error);
     return { error: 'Could not submit feedback. Please try again.' };
   }
