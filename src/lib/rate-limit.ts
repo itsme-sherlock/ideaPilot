@@ -8,7 +8,7 @@ interface RateLimit {
 
 const requests = new Map<string, RateLimit>();
 const WINDOW_MS = 60 * 60 * 1000; // 1 hour
-const MAX_REQUESTS = 3;
+const MAX_REQUESTS = 1;
 
 export async function rateLimit(): Promise<{ allowed: boolean; timeLeft?: number }> {
   const ip = await getClientIp();
