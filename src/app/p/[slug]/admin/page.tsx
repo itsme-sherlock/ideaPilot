@@ -18,12 +18,9 @@ import { Badge } from "@/components/ui/badge";
 import { Link } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { CopyButton } from "@/components/copy-button";
+import { createClient } from "@supabase/supabase-js";
 
 // --- Types ---
-type AdminPageProps = {
-  params: { slug: string };
-};
-
 type PageData = {
   id: string;
   headline: string;
@@ -44,8 +41,6 @@ type Feedback = {
   created_at: string;
 };
 
-import { createClient } from "@supabase/supabase-js";
-
 // --- Supabase Client ---
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -53,11 +48,6 @@ const supabase = createClient(
 );
 
 // --- Data Fetcher ---
-/**
- * Fetches the page data, signups, and feedback for the given slug.
- * @param slug The slug of the page.
- * @returns The page data, signups, and feedback.
- */
 async function getAdminData(slug: string): Promise<{
   page: PageData;
   signups: Signup[];
@@ -101,12 +91,12 @@ async function getAdminData(slug: string): Promise<{
 }
 
 // --- Component ---
-/**
- * The admin page component.
- * @param props The props for the component.
- */
-export default async function AdminPage(props: AdminPageProps) {
-  const { slug } = props.params;
+export default async function AdminPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params; // ✅ Await params for Next.js App Router
 
   const data = await getAdminData(slug);
   if (!data) notFound();
@@ -266,4 +256,3 @@ export default async function AdminPage(props: AdminPageProps) {
     </div>
   );
 }
-

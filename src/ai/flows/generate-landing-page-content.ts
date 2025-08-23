@@ -1,5 +1,6 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
+import { landingPagePrompt } from '@/ai/prompts/landingPagePrompt';
 
 const GenerateLandingPageContentInputSchema = z.object({
   productDescription: z.string().describe('A description of the product or idea.'),
@@ -14,11 +15,7 @@ const generateLandingPageContentPrompt = ai.definePrompt({
   name: 'generateLandingPageContentPrompt',
   input: { schema: GenerateLandingPageContentInputSchema },
   output: { schema: GenerateLandingPageContentOutputSchema },
-  prompt: `You are a marketing expert. Generate a compelling headline and sub-headline for:
-
-Product Description: {{{productDescription}}}
-
-Headline:`,
+  prompt: landingPagePrompt,
 });
 
 export const generateLandingPageContentFlow = ai.defineFlow(
