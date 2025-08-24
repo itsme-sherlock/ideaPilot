@@ -10,7 +10,7 @@ export function TypingText() {
     'No more blank screens. Just type your idea → get a page → see if people care.',
     'This won’t change the world. But it might help you start something.',
     'Not every idea is good. But none of them are real until you test.',
-    'Type your idea → get a page → share the link → watch responses come in. No planning. No hesitation. Just action.',
+    'Type your idea → get a page → share the link → watch responses come in.',
 
   ];
 

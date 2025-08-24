@@ -47,9 +47,11 @@ export function IdeaForm() {
       } else if (result.slug) {
         toast({
           title: "Success!",
-          description: "Your landing page has been created.",
+          description: "Your landing page has been created.Now redirecting you to the admin page in few seconds.",
         });
-        router.push(`/p/${result.slug}/admin`);
+        setTimeout(() => {
+          router.push(`/p/${result.slug}/admin`);
+        }, 1500); // 1.5 seconds delay before redirect
       }
     } catch (error) {
       toast({
