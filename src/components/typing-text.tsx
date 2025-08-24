@@ -27,7 +27,7 @@ export function TypingText() {
   const words = texts[index].split(' ');
 
   return (
-    <p className="text-sm text-muted-foreground mt-2 h-6 flex items-center overflow-hidden justify-center">
+    <p className="text-xs sm:text-sm md:text-base text-muted-foreground mt-2 h-7 flex items-center overflow-hidden justify-center">
       <AnimatePresence mode="wait">
         <motion.span
           key={index}
@@ -35,7 +35,7 @@ export function TypingText() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="flex flex-wrap min-h-[1.2em] leading-tight"
+          className="flex flex-wrap min-h-[1.2em] leading-tight sm:text-base"
         >
           {words.map((word, i) => (
             <motion.span
