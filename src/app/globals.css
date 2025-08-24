@@ -82,3 +82,16 @@
     @apply bg-background text-foreground;
   }
 }
+@keyframes typing-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.animate-typing-blink {
+  animation: typing-blink 1s step-start infinite;
+}
+
+@keyframes cursor-blink {
+  0%, 10%, 100% { opacity: 0.8; }
+  5%, 50% { opacity: 0; }
+}
