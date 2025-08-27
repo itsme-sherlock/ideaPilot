@@ -1,4 +1,4 @@
-'use client';
+
 import { notFound } from "next/navigation";
 import {
   Card,
@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import {
   Table,
-  TableBody,
+  TableBody,  
   TableCell,
   TableHead,
   TableHeader,
@@ -24,7 +24,7 @@ import { createClient } from "@supabase/supabase-js";
 import { format } from "date-fns";
 import { Bookmark, AlertTriangle } from "lucide-react";
 import { BookmarkButton } from "@/components/bookmark-button";
-import { useState } from 'react';
+
 
 
 // --- Types ---
@@ -309,14 +309,7 @@ export default async function AdminPage({
         </CardContent>
       </Card>
 
-      <div className="fixed bottom-6 right-6 z-50">
-  <button
-    onClick={() => setShowFeedbackModal(true)}
-    className="bg-primary text-primary-foreground px-4 py-2 rounded-full shadow-lg"
-  >
-    💬 Feedback?
-  </button>
-</div>
+      
 
       {/* What's Next? */}
       <div className="mt-12 p-6 bg-muted rounded-lg border">
