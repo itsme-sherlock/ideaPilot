@@ -1,3 +1,4 @@
+'use client';
 import { notFound } from "next/navigation";
 import {
   Card,
@@ -21,6 +22,10 @@ import { CopyButton } from "@/components/copy-button";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@supabase/supabase-js";
 import { format } from "date-fns";
+import { Bookmark, AlertTriangle } from "lucide-react";
+import { BookmarkButton } from "@/components/bookmark-button";
+import { useState } from 'react';
+
 
 // --- Types ---
 type PageData = {
@@ -127,10 +132,12 @@ export default async function AdminPage({
 
   const { page, signups, feedback } = data;
 
-  const publicUrl = `${
-    process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-  }/p/${slug}`;
+  const publicUrl = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:9002"
+    }/p/${slug}`;
+  const adminUrl = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:9002"
+    }/p/${slug}/admin`;
 
+    
   return (
     <div className="container mx-auto max-w-4xl px-4 py-12 space-y-8">
       {/* Header */}
@@ -143,6 +150,37 @@ export default async function AdminPage({
       <p className="text-muted-foreground">
         Track interest and feedback for your landing page.
       </p>
+
+      {/* Admin Link (for recovery) */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            🔐 Your Admin Dashboard
+          </CardTitle>
+          <CardDescription>
+            Save this link to track results later (bookmark it!)
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center gap-2">
+            <Input
+              value={adminUrl}
+              readOnly
+              className="font-mono text-sm bg-background text-xs"
+              aria-label="Admin dashboard URL"
+            />
+            <CopyButton
+              textToCopy={adminUrl}
+              aria-label="Copy admin URL to clipboard"
+            />
+            <BookmarkButton />
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">
+            If you lose this link, you won’t be able to access your results.
+          </p>
+        </CardContent>
+      </Card>
+
 
       {/* Share Public Link */}
       <Card>
@@ -270,6 +308,15 @@ export default async function AdminPage({
           </Table>
         </CardContent>
       </Card>
+
+      <div className="fixed bottom-6 right-6 z-50">
+  <button
+    onClick={() => setShowFeedbackModal(true)}
+    className="bg-primary text-primary-foreground px-4 py-2 rounded-full shadow-lg"
+  >
+    💬 Feedback?
+  </button>
+</div>
 
       {/* What's Next? */}
       <div className="mt-12 p-6 bg-muted rounded-lg border">
