@@ -24,6 +24,7 @@ import { createClient } from "@supabase/supabase-js";
 import { format } from "date-fns";
 import { Bookmark, AlertTriangle } from "lucide-react";
 import { BookmarkButton } from "@/components/bookmark-button";
+import { FeedbackFab } from "@/components/feedback-fab";
 
 
 
@@ -321,6 +322,8 @@ export default async function AdminPage({
           <li>• Come back tomorrow — momentum builds fast!</li>
         </ul>
       </div>
+      
+      <FeedbackFab slug={slug} />
     </div>
   );
 }

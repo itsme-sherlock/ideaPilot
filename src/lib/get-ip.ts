@@ -1,21 +1,14 @@
-// lib/getClientIp.ts
+// lib/get-ip.ts
 import { headers } from 'next/headers';
 
-export async function getClientIp(): Promise<string> {
-  const headersList = await headers();
-  const xForwardedFor = headersList.get('x-forwarded-for');
+export function getClientIp(): string {
+  const xForwardedFor = headers().get('x-forwarded-for');
   let ip = xForwardedFor?.split(',')[0]?.trim() || 'unknown';
 
-  // Normalize all localhost variants to '127.0.0.1'
-  if (
-    ip === '::1' || 
-    ip === '::ffff:127.0.0.1' || 
-    ip.startsWith('127.0.0.1') || 
-    ip === 'localhost' ||
-    ip === 'unknown'
-  ) {
+  // Normalize localhost variants
+  if (['::1', '127.0.0.1', 'localhost', 'unknown'].includes(ip)) {
     return '127.0.0.1';
   }
 
-  return ip; // For real public IPs
+  return ip;
 }

@@ -1,47 +1,55 @@
-import { getClientIp } from "./get-ip";
-
 // lib/rate-limit.ts
-interface RateLimit {
-  count: number;
-  windowStart: number;
-}
+import { createClient } from '@/lib/supabase/server';
+import { getClientIp } from './get-ip';
 
-const requests = new Map<string, RateLimit>();
 const WINDOW_MS = 60 * 60 * 1000; // 1 hour
 const MAX_REQUESTS = 1;
 
 export async function rateLimit(): Promise<{ allowed: boolean; timeLeft?: number }> {
-  const ip = await getClientIp();
-  // Get the current time in milliseconds
-  const now = Date.now();
+  const ip = getClientIp();
+  const now = new Date();
+  const oneHourAgo = new Date(now.getTime() - WINDOW_MS).toISOString();
 
-  // Fetch the current rate limit record for the IP
-  const record = requests.get(ip);
+  console.log('Checking rate limit for:', ip);
+  console.log('Window:', WINDOW_MS);
+  console.log('Max requests:', MAX_REQUESTS);
 
-  if (record) {
-    // Check if the time window has expired
-    const timeElapsedSinceWindowStart = now - record.windowStart;
-    if (timeElapsedSinceWindowStart >= WINDOW_MS) {
-      // Window expired — remove old record and start fresh
-      requests.delete(ip);
-      requests.set(ip, { count: 1, windowStart: now });
-      return { allowed: true };
-    } 
+  const supabase = createClient();
 
-    // Within window — check count
-    if (record.count >= MAX_REQUESTS) {
-      const timeLeft = WINDOW_MS - timeElapsedSinceWindowStart;
-      // Calculate the time left in the window until the rate limit is reset
-      return { allowed: false, timeLeft };
-    }
+  // Count how many times this IP has submitted in the last hour
+  const { data, error } = await supabase
+    .from('usage_logs')
+    .select('created_at', { count: 'exact' })
+    .eq('ip_address', ip)
+    .gte('created_at', oneHourAgo);
 
-    // Increment and allow
-    record.count++;
-    // No need to .set() — the record is already mutated
-    return { allowed: true };
+  if (error) {
+    console.error('Rate limit check error:', error);
+    return { allowed: true }; // Fail open — allow if DB fails
   }
 
-  // First time from this IP
-  requests.set(ip, { count: 1, windowStart: now });
+  const count = data.length;
+  console.log('Count:', count);
+
+  if (count >= MAX_REQUESTS) {
+    // Find the oldest request in the window
+    const sorted = data.sort((a, b) => 
+      new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+    );
+    const oldest = new Date(sorted[0].created_at).getTime();
+    const timeLeft = WINDOW_MS - (now.getTime() - oldest);
+    console.log('Oldest request:', new Date(oldest).toISOString());
+    console.log('Time left:', timeLeft);
+    
+    return { allowed: false, timeLeft };
+  }
+
+  // Log this request
+  await supabase.from('usage_logs').insert({
+    ip_address: ip,
+    created_at: now.toISOString()
+  });
+
+  console.log('Allowed!');
   return { allowed: true };
 }

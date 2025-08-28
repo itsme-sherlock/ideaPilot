@@ -5,11 +5,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 export function TypingText() {
   const texts = [
-    'I kept having ideas but never starting. So I built this to finally test one.',
+    'The fastest way to test your business idea',
     'For anyone who’s ever had an idea… and then just left it in Notes.',
     'No more blank screens. Just type your idea → get a page → see if people care.',
     'This won’t change the world. But it might help you start something.',
-    'Not every idea is good. But none of them are real until you test.',
+    'Get a live landing page and collect feedback — no code needed.',
     'Type your idea → get a page → share the link → watch responses come in.',
 
   ];

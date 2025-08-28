@@ -6,7 +6,6 @@ import { slugify } from '@/lib/utils';
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { rateLimit } from '@/lib/rate-limit';
-import { headers } from 'next/headers';
 import { getClientIp } from '@/lib/get-ip';
 
 // -------------------------
@@ -35,32 +34,68 @@ const addFeedbackSchema = z.object({
 
 export async function createLandingPage(values: z.infer<typeof createPageSchema>) {
   console.log('Entering createLandingPage function.');
+
+  // STEP 1: Validate input
+  // Use the safeParse method of the createPageSchema to validate the input.
+  // If the input is invalid, return an error message.
   const validatedFields = createPageSchema.safeParse(values);
   if (!validatedFields.success) {
     console.error('Validation failed:', validatedFields.error.flatten().fieldErrors);
     return { error: 'Invalid input.' };
   }
 
+  // STEP 2: Extract validated fields
+  // Extract the validated fields from the createPageSchema.
+  // These are the fields that were validated in the previous step.
   const { productDescription, email } = validatedFields.data;
+  console.log('Validated fields:', { productDescription, email });
+
+  // STEP 3: CHECK RATE LIMIT FIRST
+  // Call the rateLimit function to check if the IP is rate limited.
+  // If the IP is rate limited, return an error message.
+  console.log('Checking rate limit...');
+  const { allowed, timeLeft } = await rateLimit();
+  if (!allowed) {
+    const minutesLeft = Math.ceil(timeLeft! / 60000);
+    console.log(`Rate limited. IP blocked for ${minutesLeft} more minutes.`);
+    return { 
+      error: `Too many requests. Try again in ${minutesLeft} minute${minutesLeft > 1 ? 's' : ''}.` 
+    };
+  }
+
+  // STEP 4: Create Supabase client
+  // Create a new Supabase client.
+  // This client will be used to interact with the Supabase database.
   const supabase = createClient();
+  console.log('Created Supabase client.');
 
   try {
+    // STEP 5: CALL AI (after rate limit)
+    // Call the generateLandingPageContent function to generate content for the landing page.
+    // The generateLandingPageContent function will call the AI to generate content.
+    // The AI will generate content based on the product description.
     console.log('Calling AI to generate content for:', productDescription);
     const content = await generateLandingPageContent({ productDescription });
-    //commenting the code to save api call
-    // const content = { headline: 'Headline', subHeadline: 'Subheadline' };
     console.log('AI returned:', content);
 
+    // STEP 6: Extract generated content
+    // Extract the generated content from the generateLandingPageContent function.
+    // The generated content will contain the headline and sub-headline for the landing page.
     const { headline, subHeadline } = content;
     if (!headline || !subHeadline) {
       return { error: 'Failed to generate content. Please try again.' };
     }
 
-    // Generate unique slug
+    // STEP 7: GENERATE UNIQUE SLUG
+    // Generate a unique slug for the landing page.
+    // The slug will be used to create a unique URL for the landing page.
     let slug = slugify(headline);
     let counter = 1;
 
-    console.log('Checking slug availability:', slug);
+    // STEP 8: CHECK IF SLUG ALREADY EXISTS
+    // Check if the generated slug already exists in the database.
+    // If the slug already exists, generate a new slug.
+    console.log('Checking if slug already exists...');
     let { data: existing } = await supabase
       .from('pages')
       .select('slug')
@@ -68,7 +103,6 @@ export async function createLandingPage(values: z.infer<typeof createPageSchema>
       .maybeSingle();
 
     while (existing) {
-      console.log(`Slug "${slug}" taken. Trying next...`);
       slug = `${slugify(headline)}-${counter}`;
       const { data: nextData } = await supabase
         .from('pages')
@@ -80,10 +114,11 @@ export async function createLandingPage(values: z.infer<typeof createPageSchema>
     }
     console.log('Final slug:', slug);
 
-    // Insert into Supabase
+    // STEP 9: INSERT LANDING PAGE
+    // Insert the landing page into the database.
+    // The landing page will contain the generated headline and sub-headline.
+    console.log('Inserting landing page...');
     const now = new Date().toISOString();
-    console.log('Inserting new page into Supabase:', { headline, subHeadline, slug, email });
-
     const { error: insertError } = await supabase.from('pages').insert({
       idea: productDescription,
       creator_email: email,
@@ -98,10 +133,16 @@ export async function createLandingPage(values: z.infer<typeof createPageSchema>
       return { error: 'Could not save landing page.' };
     }
 
-    // Revalidate dynamic routes
+    // STEP 10: REVALIDATE PATHS
+    // Revalidate the paths for the landing page and admin page.
+    // This will ensure that the pages are rebuilt with the new data.
+    console.log('Revalidating paths...');
     revalidatePath(`/p/${slug}`);
     revalidatePath(`/p/${slug}/admin`);
 
+    // STEP 11: RETURN SLUG
+    // Return the generated slug.
+    // The slug will be used to redirect the user to the landing page.
     return { slug };
   } catch (error: any) {
     console.error('Error in createLandingPage:', error);
