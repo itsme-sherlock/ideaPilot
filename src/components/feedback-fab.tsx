@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type FeedbackFabProps = {
   slug: string;
@@ -24,6 +25,7 @@ export function FeedbackFab({ slug }: FeedbackFabProps) {
   const [feedbackText, setFeedbackText] = useState("");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const { toast } = useToast();
+  const isMobile = useIsMobile()
 
   const validate = (text: string) => text.trim().length >= 10;
 
@@ -61,7 +63,14 @@ export function FeedbackFab({ slug }: FeedbackFabProps) {
         }}
         className="px-4 py-2 rounded-full text-sm"
       >
-        💬 Feedback to the creators?
+        {isMobile ? (
+          "💬"// Render only the icon on mobile view
+        ) : (
+          <span>
+            💬
+            Feedback to creators
+          </span>
+        )}
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>

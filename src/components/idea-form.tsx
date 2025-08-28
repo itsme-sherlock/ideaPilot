@@ -46,6 +46,7 @@ export function IdeaForm() {
         });
       } else if (result.slug) {
         toast({
+          variant: "success",
           title: "Success!",
           description: "Success! Your page is live. Redirecting you to your dashboard... ",
         });

@@ -123,19 +123,19 @@ function StatsSummary({ signups, feedback }: { signups: Signup[], feedback: Feed
     <div className="grid gap-4 md:grid-cols-3 mb-6">
       <Card>
         <CardContent className="p-4">
-          <div className="text-2xl font-bold">{signups.length}</div>
+          <div className="text-2xl text-primary font-bold">{signups.length}</div>
           <p className="text-xs text-muted-foreground">Email signups</p>
         </CardContent>
       </Card>
       <Card>
         <CardContent className="p-4">
-          <div className="text-2xl font-bold">{totalResponses}</div>
+          <div className="text-2xl text-primary font-bold">{totalResponses}</div>
           <p className="text-xs text-muted-foreground">Total feedback</p>
         </CardContent>
       </Card>
       <Card>
         <CardContent className="p-4">
-          <div className="text-2xl font-bold">{interestRate}%</div>
+          <div className="text-2xl text-primary font-bold">{interestRate}%</div>
           <p className="text-xs text-muted-foreground">Interest rate</p>
         </CardContent>
       </Card>
