@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, use } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
 export function TypingText() {
   const texts = [
@@ -15,26 +15,28 @@ export function TypingText() {
   ];
 
   const [index, setIndex] = useState(0);
+  const shouldReduceMotion = useReducedMotion
 
   // Cycle messages
   useEffect(() => {
     const timer = setTimeout(() => {
       setIndex((prev) => (prev + 1) % texts.length);
-    }, 4000); // Show each for 4s
+    }, 6000); // Show each for 6s
     return () => clearTimeout(timer);
   }, [index]);
 
   const words = texts[index].split(' ');
 
   return (
-    <p className="text-xs sm:text-sm md:text-base text-muted-foreground mt-2 h-7 flex items-center overflow-hidden justify-center">
+    <p className="text-sm sm:text-base md:text-lg text-muted-foreground mt-2 h-7 flex items-center overflow-hidden justify-center">
       <AnimatePresence mode="wait">
         <motion.span
+          aria-live='polite'
           key={index}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
+          transition={{ duration: shouldReduceMotion() ? 0 : 0.2, ease: 'easeInOut' }}
           className="flex flex-wrap min-h-[1.2em] leading-tight sm:text-base"
         >
           {words.map((word, i) => (

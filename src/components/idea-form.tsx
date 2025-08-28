@@ -47,7 +47,7 @@ export function IdeaForm() {
       } else if (result.slug) {
         toast({
           title: "Success!",
-          description: "Your landing page has been created.Now redirecting you to the admin page in few seconds.",
+          description: "Success! Your page is live. Redirecting you to your dashboard... ",
         });
         setTimeout(() => {
           router.push(`/p/${result.slug}/admin`);

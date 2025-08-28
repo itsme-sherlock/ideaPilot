@@ -61,7 +61,7 @@ export function FeedbackFab({ slug }: FeedbackFabProps) {
         }}
         className="px-4 py-2 rounded-full text-sm"
       >
-        💬 Feedback?
+        💬 Feedback to the creators?
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
