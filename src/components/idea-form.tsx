@@ -67,7 +67,7 @@ export function IdeaForm() {
   
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 bg-white p-4 rounded-lg no-border">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 bg-white p-4 rounded-lg no-border shadow-xl">
         <FormField
           control={form.control}
           name="productDescription"

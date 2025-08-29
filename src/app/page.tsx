@@ -64,7 +64,7 @@ export default function Home() {
         </div>
 
         {/* How It Works Section - More empathetic */}
-        <div className="mt-6 text-left bg-muted/50 p-5 rounded-lg border border-muted shadow-sm space-y-4">
+        <div className="mt-6 text-left bg-muted/50 p-5 rounded-lg border border-muted shadow-md space-y-4">
           <p className="text-sm font-medium text-foreground text-center mb-2">
             We know that feeling...
           </p>
@@ -134,7 +134,7 @@ export default function Home() {
         </div>
 
         {/* CTA Section */}
-        <div className="bg-muted/40 p-5 rounded-xl border border-muted shadow-md space-y-4">
+        <div className="p-5 rounded-xl  space-y-4">
           <p className="text-sm text-muted-foreground">
             Free • No signup required • Validation ready in 60 seconds
           </p>
