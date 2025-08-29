@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, XCircle, AlertCircle, Mail, MessageCircle } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
+import ReactMarkdown from 'react-markdown';
 
 // --- Types ---
 type PageData = {
@@ -394,10 +395,13 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
           </h1>
 
           {sub_headline && (
-            <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed">
-              {sub_headline}
-            </p>
-          )}
+  <div className="text-lg md:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed">
+    <div className="prose prose-sm prose-primary">
+      <ReactMarkdown>{sub_headline}</ReactMarkdown>
+    </div>
+  </div>
+)}
+
 
           <SocialProof signupCount={signupCount} />
         </header>
@@ -449,7 +453,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
                 href="/" 
                 className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors font-medium"
               >
-                Test Your Idea in 60 Seconds →
+                Start Testing Your Idea in 60 Seconds →
               </a>
             </CardContent>
           </Card>

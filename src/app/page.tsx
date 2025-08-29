@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { Lightbulb, TestTube, Users, TrendingUp } from 'lucide-react';
+import { IdeaForm } from '@/components/idea-form';
+import { FeedbackFab } from '@/components/feedback-fab';
 
 export default function Home() {
   // ✅ Base URL
@@ -136,35 +138,9 @@ export default function Home() {
           <p className="text-sm text-muted-foreground">
             Free • No signup required • Validation ready in 60 seconds
           </p>
-          
+          <IdeaForm />
           {/* Placeholder for IdeaForm component */}
-          <div className="bg-white p-4 rounded-lg border space-y-3">
-            <div>
-              <p className="text-sm text-muted-foreground mb-2">Describe your startup idea:</p>
-              <input 
-                type="text" 
-                placeholder="AI-powered meal planning for busy families..."
-                className="w-full p-3 border rounded-lg text-sm"
-              />
-            </div>
-            
-            <div>
-              <p className="text-sm text-muted-foreground mb-2">Your email (to send you the validation link):</p>
-              <input 
-                type="email" 
-                placeholder="you@example.com"
-                className="w-full p-3 border rounded-lg text-sm"
-              />
-            </div>
-            
-            <button className="w-full bg-primary text-primary-foreground py-3 px-4 rounded-lg font-medium hover:bg-primary/90 transition-colors">
-              Create My Validation Test
-            </button>
-            
-            <p className="text-xs text-muted-foreground text-center">
-              We'll email you the link to your validation page + results dashboard
-            </p>
-          </div>
+         
         </div>
 
         {/* Example Links - Validation focused */}
@@ -203,6 +179,9 @@ export default function Home() {
         <p className="text-xs text-muted-foreground text-center mt-6">
           🚀 Early MVP — your feedback shapes the product
         </p>
+
+        {/* feedback */}
+        <FeedbackFab slug={slug} />
 
       </div>
     </main>
