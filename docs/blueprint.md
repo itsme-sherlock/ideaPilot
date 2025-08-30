@@ -1,4 +1,4 @@
-# **App Name**: gono-go
+# **App Name**: GoNo-Go
 
 ## Core Features:
 
@@ -6,7 +6,7 @@
 - AI-Powered Content: Generates a headline and sub-headline using OpenAI based on the user's product idea. The headline and subheadline make use of the prompt filled in by the user to improve its output. The AI is used as a tool to assist users who struggle to generate content for landing pages.
 - Landing Page Display: Displays the AI-generated headline and sub-headline on a public landing page.
 - Feedback Widget: Displays a simple feedback widget with 'Yes' and 'No' options.
-- Branding Footer: Displays a 'Built with gono-go' footer to promote the application.
+- Branding Footer: Displays a 'Built with GoNo-Go' footer to promote the application.
 
 ## Style Guidelines:
 

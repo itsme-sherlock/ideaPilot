@@ -27,7 +27,7 @@ const supabase = createClient(
 // Simplified Error Component
 const ErrorDisplay = ({ errorType, onRetry }: { errorType: ErrorType; onRetry: () => void }) => {
   const isNotFound = errorType === 'not-found';
-  
+
   return (
     <div className="container mx-auto max-w-2xl px-4 py-20 text-center">
       <div className="text-6xl mb-4">😕</div>
@@ -37,7 +37,7 @@ const ErrorDisplay = ({ errorType, onRetry }: { errorType: ErrorType; onRetry: (
       <p className="text-muted-foreground mb-8">
         {isNotFound ? 'This validation page doesn\'t exist or has been removed.' : 'Please try again in a moment.'}
       </p>
-      
+
       <div className="space-y-4">
         <button
           onClick={onRetry}
@@ -83,7 +83,7 @@ const SocialProof = ({ signupCount }: { signupCount?: number }) => {
       </div>
     );
   }
-  
+
   return (
     <div className="flex items-center justify-center gap-2 text-sm mb-8">
       <span className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-full font-medium border border-blue-200">
@@ -132,7 +132,7 @@ const SignupForm = ({ pageId }: { pageId: string }) => {
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-2">
+      <div className="flex flex-col md:flex-row gap-2">
         <input
           type="email"
           value={email}
@@ -170,9 +170,9 @@ const FeedbackWidget = ({ pageId }: { pageId: string }) => {
 
   const handleSubmitFeedback = async () => {
     if (!selectedFeedback) return;
-    
+
     setIsSubmitting(true);
-    
+
     try {
       if (!pageId) {
         console.error('No pageId provided for feedback');
@@ -182,8 +182,8 @@ const FeedbackWidget = ({ pageId }: { pageId: string }) => {
 
       const { data, error } = await supabase
         .from('feedback')
-        .insert([{ 
-          page_id: pageId, 
+        .insert([{
+          page_id: pageId,
           response: selectedFeedback,
           comment: comment.trim() || null
         }])
@@ -197,7 +197,7 @@ const FeedbackWidget = ({ pageId }: { pageId: string }) => {
           details: error.details,
           hint: error.hint
         });
-        
+
         setIsSubmitting(false);
         alert('Failed to submit feedback. Please try again.');
         return;
@@ -205,7 +205,7 @@ const FeedbackWidget = ({ pageId }: { pageId: string }) => {
 
       console.log('Feedback submitted successfully:', data);
       setIsSubmitted(true);
-      
+
     } catch (networkError) {
       console.error('Network/unexpected error:', networkError);
       setIsSubmitting(false);
@@ -217,7 +217,7 @@ const FeedbackWidget = ({ pageId }: { pageId: string }) => {
     // For users who don't want to add comments, submit immediately
     setSelectedFeedback(feedback);
     setIsSubmitting(true);
-    
+
     try {
       if (!pageId) {
         console.error('No pageId provided for feedback');
@@ -227,8 +227,8 @@ const FeedbackWidget = ({ pageId }: { pageId: string }) => {
 
       const { data, error } = await supabase
         .from('feedback')
-        .insert([{ 
-          page_id: pageId, 
+        .insert([{
+          page_id: pageId,
           response: feedback,
           comment: null
         }])
@@ -243,7 +243,7 @@ const FeedbackWidget = ({ pageId }: { pageId: string }) => {
 
       console.log('Quick feedback submitted successfully:', data);
       setIsSubmitted(true);
-      
+
     } catch (networkError) {
       console.error('Network/unexpected error:', networkError);
       setIsSubmitting(false);
@@ -269,11 +269,10 @@ const FeedbackWidget = ({ pageId }: { pageId: string }) => {
         <button
           onClick={() => handleFeedbackClick('yes')}
           disabled={isSubmitting}
-          className={`flex-1 flex items-center justify-center gap-2 p-4 border-2 rounded-lg transition-colors ${
-            selectedFeedback === 'yes' 
-              ? 'border-green-500 bg-green-100 text-green-800' 
+          className={`flex-1 flex items-center justify-center gap-2 p-4 border-2 rounded-lg transition-colors ${selectedFeedback === 'yes'
+              ? 'border-green-500 bg-green-100 text-green-800'
               : 'border-green-200 bg-green-50 text-green-800 hover:bg-green-100'
-          } ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+            } ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
         >
           <CheckCircle className="w-5 h-5" />
           Yes, I'd use this
@@ -281,30 +280,29 @@ const FeedbackWidget = ({ pageId }: { pageId: string }) => {
         <button
           onClick={() => handleFeedbackClick('no')}
           disabled={isSubmitting}
-          className={`flex-1 flex items-center justify-center gap-2 p-4 border-2 rounded-lg transition-colors ${
-            selectedFeedback === 'no' 
-              ? 'border-red-500 bg-red-100 text-red-800' 
+          className={`flex-1 flex items-center justify-center gap-2 p-4 border-2 rounded-lg transition-colors ${selectedFeedback === 'no'
+              ? 'border-red-500 bg-red-100 text-red-800'
               : 'border-red-200 bg-red-50 text-red-800 hover:bg-red-100'
-          } ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+            } ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
         >
           <XCircle className="w-5 h-5" />
           Not for me
         </button>
       </div>
-      
+
       {selectedFeedback && !isSubmitted && (
         <div className="space-y-3 border-t pt-4">
           <textarea
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            placeholder={selectedFeedback === 'yes' ? 
-              "What excites you about this? (optional)" : 
+            placeholder={selectedFeedback === 'yes' ?
+              "What excites you about this? (optional)" :
               "What would you change or improve? (optional)"
             }
             rows={3}
             className="w-full px-3 py-2 border border-muted-foreground/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
           />
-          
+
           <div className="flex gap-2">
             <button
               onClick={handleSubmitFeedback}
@@ -313,7 +311,7 @@ const FeedbackWidget = ({ pageId }: { pageId: string }) => {
             >
               {isSubmitting ? 'Submitting...' : comment.trim() ? 'Submit with Comment' : 'Submit'}
             </button>
-            
+
             <button
               onClick={() => handleQuickSubmit(selectedFeedback)}
               disabled={isSubmitting}
@@ -395,12 +393,12 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
           </h1>
 
           {sub_headline && (
-  <div className="text-lg md:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed">
-    <div className="prose prose-sm prose-primary">
-      <ReactMarkdown>{sub_headline}</ReactMarkdown>
-    </div>
-  </div>
-)}
+            <div className="text-lg md:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed">
+              <div className="prose prose-sm prose-primary">
+                <ReactMarkdown>{sub_headline}</ReactMarkdown>
+              </div>
+            </div>
+          )}
 
 
           <SocialProof signupCount={signupCount} />
@@ -449,8 +447,8 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
               <p className="text-muted-foreground mb-3">
                 <strong className="text-foreground">Got your own idea?</strong>
               </p>
-              <a 
-                href="/" 
+              <a
+                href="/"
                 className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors font-medium"
               >
                 Start Testing Your Idea in 60 Seconds →
@@ -468,7 +466,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
             <p className="text-xs mt-2">
               Powered by{' '}
               <a href="/" className="text-primary hover:underline font-medium">
-                gono-go
+                IdeaPilot
               </a>
               {' '}— Turn any idea into a validation page in 60 seconds
             </p>

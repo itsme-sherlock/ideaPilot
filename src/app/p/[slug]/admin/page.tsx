@@ -523,7 +523,7 @@ export default function AdminPage({
                 <div className="pt-2">
                   <p className="text-xs text-muted-foreground">
                     💡 Want to be notified when it's ready? Drop us a line at{" "}
-                    <span className="font-medium text-foreground">updates@yourapp.com</span>
+                    <span className="font-medium text-foreground">info@GoNo-Go.com</span>
                   </p>
                 </div>
               </DialogDescription>
