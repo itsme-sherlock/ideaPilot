@@ -48,7 +48,7 @@ export function FeedbackFab({ slug }: FeedbackFabProps) {
       } else {
         setOpen(false);
         setFeedbackText("");
-        toast({ title: "Feedback received", description: "Thanks! We’ll use it to improve IdeaPilot." });
+        toast({ title: "Feedback received", description: "Thanks! We’ll use it to improve gono-go." });
       }
     });
   };
@@ -78,7 +78,7 @@ export function FeedbackFab({ slug }: FeedbackFabProps) {
           <DialogHeader>
             <DialogTitle>Send product feedback</DialogTitle>
             <DialogDescription>
-              Tell us how we can improve IdeaPilot. Minimum 10 characters.
+              Tell us how we can improve gono-go. Minimum 10 characters.
             </DialogDescription>
           </DialogHeader>
 

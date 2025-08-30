@@ -32,7 +32,7 @@ export async function submitToolFeedback(formData: FormData) {
     // Optional: Revalidate admin page
     revalidatePath(`/p/[slug]/admin`, 'page');
 
-    return { success: 'Thank you for your feedback! We’ll use it to improve IdeaPilot.' };
+    return { success: 'Thank you for your feedback! We’ll use it to improve gono-go.' };
   } catch (error) {
     console.error('Unexpected error:', error);
     return { error: 'Something went wrong. Please try again.' };

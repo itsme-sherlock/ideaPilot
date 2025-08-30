@@ -468,7 +468,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
             <p className="text-xs mt-2">
               Powered by{' '}
               <a href="/" className="text-primary hover:underline font-medium">
-                IdeaPilot
+                gono-go
               </a>
               {' '}— Turn any idea into a validation page in 60 seconds
             </p>
