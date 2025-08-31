@@ -17,7 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Link, MessageSquare, Users, Lightbulb } from "lucide-react";
+import { Link, MessageSquare, Users, Lightbulb, ChevronDown, ChevronUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { CopyButton } from "@/components/copy-button";
 import { Button } from "@/components/ui/button";
@@ -139,6 +139,52 @@ function StatsSummary({ signups, feedback }: { signups: Signup[], feedback: Feed
           <p className="text-xs text-muted-foreground">Interest rate</p>
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+// --- Expandable Comment Component ---
+function ExpandableComment({ comment }: { comment: string | null }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  
+  if (!comment) {
+    return <span className="text-muted-foreground italic">No comment</span>;
+  }
+
+  // Check if comment is long enough to need expansion (roughly 2 lines worth)
+  const needsExpansion = comment.length > 100;
+  
+  if (!needsExpansion) {
+    return (
+      <div className="text-sm leading-relaxed text-foreground">
+        {comment}
+      </div>
+    );
+  }
+
+  return (
+    <div className="text-sm leading-relaxed text-foreground">
+      <div className={isExpanded ? "" : "line-clamp-2"}>
+        {comment}
+      </div>
+      <Button
+        variant="ghost"
+        size="sm"
+        className="mt-1 h-6 px-2 text-xs text-primary hover:text-primary/80 hover:bg-primary/10"
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        {isExpanded ? (
+          <>
+            <ChevronUp className="h-3 w-3 mr-1" />
+            Show less
+          </>
+        ) : (
+          <>
+            <ChevronDown className="h-3 w-3 mr-1" />
+            Show more
+          </>
+        )}
+      </Button>
     </div>
   );
 }
@@ -341,11 +387,7 @@ export default function AdminPage({
                                 </Badge>
                               </TableCell>
                               <TableCell className="max-w-md">
-                                <div className="line-clamp-2 text-sm leading-relaxed text-foreground">
-                                  {f.comment || (
-                                    <span className="text-muted-foreground italic">No comment</span>
-                                  )}
-                                </div>
+                                <ExpandableComment comment={f.comment} />
                               </TableCell>
                               <TableCell className="text-right text-sm text-muted-foreground">
                                 {timeAgo(f.created_at)}
@@ -488,7 +530,7 @@ export default function AdminPage({
               <DialogTitle className="flex items-center gap-2">
                 🚀 {comingSoonFeature}
               </DialogTitle>
-              <DialogDescription className="text-left space-y-3">
+              <DialogDescription asChild className="text-left space-y-3">
                 <p>This feature is coming soon! We're working hard to bring you:</p>
                 <ul className="list-disc list-inside space-y-1 text-sm">
                   {comingSoonFeature === "CSV Export" && (

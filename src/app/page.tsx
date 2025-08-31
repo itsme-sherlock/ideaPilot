@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { Lightbulb, TestTube, Users, TrendingUp } from 'lucide-react';
+import { Lightbulb, TestTube, Users, TrendingUp, Mail } from 'lucide-react';
 import { IdeaForm } from '@/components/idea-form';
 import { FeedbackFab } from '@/components/feedback-fab';
+import { Footer } from '@/components/footer';
 
 export default function Home() {
   // ✅ Base URL
@@ -189,9 +190,7 @@ export default function Home() {
         </div>
 
         {/* Footer Trust Line */}
-        <p className="text-xs text-muted-foreground text-center mt-6">
-          🚀 Early MVP — your feedback shapes the product
-        </p>
+        <Footer/>
 
         {/* feedback */}
         <FeedbackFab slug={slug} />
