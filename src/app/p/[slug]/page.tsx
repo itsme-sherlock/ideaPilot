@@ -529,7 +529,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
                 <div className="text-center space-y-2">
                   <div className="bg-primary text-primary-foreground w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold mx-auto">4</div>
                   <div className="font-medium text-foreground">Smart GO decision</div>
-                  <div className="text-xs text-muted-foreground">Build it with confidence</div>
+                  <div className="text-xs text-muted-foreground">Creator will build it with confidence</div>
                 </div>
               </div>
               <div className="text-center mt-6 p-3 bg-background rounded border-l-4 border-primary">
