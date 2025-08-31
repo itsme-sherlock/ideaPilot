@@ -141,7 +141,7 @@ function StepCard({
             <div className="flex items-center gap-3 mb-2">
               <CardTitle className="text-lg">{title}</CardTitle>
               <div className="flex items-center gap-2">
-                <Checkbox
+                {/* <Checkbox
                   id={checkboxId}
                   checked={isChecked}
                   onCheckedChange={onCheckboxChange}
@@ -151,7 +151,7 @@ function StepCard({
                   className="text-xs text-muted-foreground cursor-pointer"
                 >
                   Mark as done
-                </label>
+                </label> */}
               </div>
             </div>
             <CardDescription className="text-sm">
@@ -186,6 +186,8 @@ function MetricCard({
   icon?: React.ReactNode;
   tooltip?: string;
 }) {
+  const [isTooltipOpen, setIsTooltipOpen] = useState(false);
+
   return (
     <Card>
       <CardContent className="p-4">
@@ -195,9 +197,15 @@ function MetricCard({
               <div className="text-2xl text-primary font-bold">{value}</div>
               {tooltip && (
                 <TooltipProvider>
-                  <Tooltip>
+                  <Tooltip open={isTooltipOpen} onOpenChange={setIsTooltipOpen}>
                     <TooltipTrigger asChild>
-                      <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                      <button
+                        onClick={() => setIsTooltipOpen(!isTooltipOpen)}
+                        className="cursor-help focus:outline-none focus:ring-2 focus:ring-primary/20 rounded"
+                        aria-label="More information"
+                      >
+                        <Info className="h-4 w-4 text-muted-foreground" />
+                      </button>
                     </TooltipTrigger>
                     <TooltipContent>
                       <p className="text-sm max-w-xs">{tooltip}</p>
@@ -1078,31 +1086,7 @@ export default function AdminPage({
                     </div>
                   </Button>
 
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start h-auto p-4 text-left"
-                    onClick={() => handleComingSoon("Advanced Analytics")}
-                  >
-                    <div>
-                      <div className="font-medium text-sm">📊 Advanced Analytics</div>
-                      <div className="text-xs text-muted-foreground mt-1">
-                        Deep insights and trend analysis
-                      </div>
-                    </div>
-                  </Button>
-
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start h-auto p-4 text-left"
-                    onClick={() => handleComingSoon("A/B Testing")}
-                  >
-                    <div>
-                      <div className="font-medium text-sm">🧪 A/B Testing</div>
-                      <div className="text-xs text-muted-foreground mt-1">
-                        Test different versions of your idea
-                      </div>
-                    </div>
-                  </Button>
+                  
                 </div>
 
                 <p className="text-xs text-muted-foreground mt-4 text-center">
