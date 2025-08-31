@@ -35,7 +35,7 @@ const ErrorDisplay = ({ errorType, onRetry }: { errorType: ErrorType; onRetry: (
         {isNotFound ? 'Page Not Found' : 'Something Went Wrong'}
       </h1>
       <p className="text-muted-foreground mb-8">
-        {isNotFound ? 'This validation page doesn\'t exist or has been removed.' : 'Please try again in a moment.'}
+        {isNotFound ? 'This validation page may have moved or been updated.' : 'Please try again in a moment.'}
       </p>
 
       <div className="space-y-4">
@@ -71,7 +71,7 @@ const LoadingDisplay = () => (
   </div>
 );
 
-// Smart Social Proof - More compelling
+// Smart Social Proof - More compelling with validation focus
 const SocialProof = ({ signupCount }: { signupCount?: number }) => {
   if (signupCount && signupCount > 0) {
     return (
@@ -88,13 +88,13 @@ const SocialProof = ({ signupCount }: { signupCount?: number }) => {
     <div className="flex items-center justify-center gap-2 text-sm mb-8">
       <span className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-full font-medium border border-blue-200">
         <AlertCircle className="w-4 h-4" />
-        Testing demand for this idea
+        Idea validation in progress
       </span>
     </div>
   );
 };
 
-// Enhanced Signup Form Component
+// Enhanced Signup Form Component with better explanation
 const SignupForm = ({ pageId }: { pageId: string }) => {
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -122,9 +122,9 @@ const SignupForm = ({ pageId }: { pageId: string }) => {
     return (
       <div className="text-center py-6 space-y-3">
         <CheckCircle className="w-12 h-12 text-green-600 mx-auto" />
-        <p className="font-medium text-green-800">Added to the list!</p>
+        <p className="font-medium text-green-800">Your vote has been counted!</p>
         <p className="text-sm text-muted-foreground">
-          You'll be notified if this gets built.
+          You'll be first to know if this gets built based on demand.
         </p>
       </div>
     );
@@ -132,6 +132,16 @@ const SignupForm = ({ pageId }: { pageId: string }) => {
 
   return (
     <div className="space-y-4">
+      <div className="bg-muted/30 border border-border rounded-lg p-4 mb-4">
+        <p className="text-sm text-foreground font-medium mb-2">How Your Email Helps:</p>
+        <ul className="text-xs text-muted-foreground space-y-1 text-left">
+          <li>• Shows the creator there's real demand for this idea</li>
+          <li>• Your signup counts as a strong "YES, build this!" vote</li>
+          <li>• Helps the entrepreneur make a confident GO decision</li>
+          <li>• You get early access if it gets developed</li>
+        </ul>
+      </div>
+      
       <div className="flex flex-col md:flex-row gap-2">
         <input
           type="email"
@@ -146,17 +156,17 @@ const SignupForm = ({ pageId }: { pageId: string }) => {
           disabled={isSubmitting || !email.trim()}
           className="bg-primary text-primary-foreground px-6 py-3 rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
         >
-          {isSubmitting ? 'Adding...' : 'Count Me In'}
+          {isSubmitting ? 'Adding...' : 'Yes, Build This!'}
         </button>
       </div>
       <p className="text-xs text-muted-foreground">
-        We'll only contact you if this idea moves forward
+        We'll only contact you if this idea moves forward to development
       </p>
     </div>
   );
 };
 
-// Enhanced Feedback Widget - Fixed flow
+// Enhanced Feedback Widget with better explanation
 const FeedbackWidget = ({ pageId }: { pageId: string }) => {
   const [selectedFeedback, setSelectedFeedback] = useState<'yes' | 'no' | null>(null);
   const [comment, setComment] = useState('');
@@ -255,9 +265,9 @@ const FeedbackWidget = ({ pageId }: { pageId: string }) => {
     return (
       <div className="text-center py-4 space-y-2">
         <CheckCircle className="w-8 h-8 text-green-600 mx-auto" />
-        <p className="font-medium">Thanks for the feedback!</p>
+        <p className="font-medium">Thanks for helping validate this idea!</p>
         <p className="text-sm text-muted-foreground">
-          Your input helps validate this idea.
+          Your feedback helps the creator make smart development decisions.
         </p>
       </div>
     );
@@ -265,6 +275,12 @@ const FeedbackWidget = ({ pageId }: { pageId: string }) => {
 
   return (
     <div className="space-y-4">
+      <div className="bg-muted/30 border border-border rounded-lg p-3 mb-4">
+        <p className="text-xs text-muted-foreground">
+          <strong className="text-foreground">Your honest opinion matters:</strong> The creator will use this feedback to decide whether to invest time developing this idea or focus on concepts with stronger market appeal.
+        </p>
+      </div>
+      
       <div className="flex gap-3">
         <button
           onClick={() => handleFeedbackClick('yes')}
@@ -297,7 +313,7 @@ const FeedbackWidget = ({ pageId }: { pageId: string }) => {
             onChange={(e) => setComment(e.target.value)}
             placeholder={selectedFeedback === 'yes' ?
               "What excites you about this? (optional)" :
-              "What would you change or improve? (optional)"
+              "What would make this more appealing? (optional)"
             }
             rows={3}
             className="w-full px-3 py-2 border border-muted-foreground/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
@@ -386,8 +402,14 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/10">
       <div className="container mx-auto max-w-4xl px-4 py-16">
 
-        {/* Hero Section - Clear, focused */}
+        {/* Hero Section - Clear validation messaging */}
         <header className="text-center mb-16">
+          <div className="mb-4">
+            <span className="inline-flex items-center gap-2 px-3 py-1 bg-muted text-muted-foreground rounded-full text-sm font-medium border border-border">
+              🧪 Idea Validation in Progress
+            </span>
+          </div>
+          
           <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
             {headline}
           </h1>
@@ -400,11 +422,52 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
             </div>
           )}
 
+          <div className="bg-muted/50 border border-border rounded-lg p-4 mb-8 max-w-2xl mx-auto">
+            <p className="text-sm text-foreground font-medium mb-2">
+              This could be your next favorite product — we're testing demand first.
+            </p>
+            <p className="text-xs text-muted-foreground">
+              The creator is gathering market signals before development begins. Your response will directly influence whether this becomes reality.
+            </p>
+          </div>
 
           <SocialProof signupCount={signupCount} />
         </header>
 
-        {/* Main CTAs - Simplified, focused */}
+        {/* Explanation Section - Why their participation matters */}
+        <div className="mb-12 max-w-3xl mx-auto">
+          <Card className="bg-muted/30 border-border">
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold text-center mb-4 text-foreground">
+                🎯 Why Your Response Matters
+              </h3>
+              <div className="space-y-3 text-sm text-muted-foreground">
+                <p>
+                  Right now, this is a promising idea ready for development. The creator wants to build something people actually want.
+                </p>
+                <div className="grid md:grid-cols-3 gap-4 mt-4">
+                  <div className="text-center">
+                    <div className="font-medium text-foreground">Your "YES" vote</div>
+                    <div className="text-xs">Real market validation</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="font-medium text-foreground">Your email signup</div>
+                    <div className="text-xs">Proof of genuine interest</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="font-medium text-foreground">Your feedback</div>
+                    <div className="text-xs">Direction for enhancement</div>
+                  </div>
+                </div>
+                <p className="text-center font-medium mt-4 text-foreground">
+                  You're not just giving feedback — you're helping an entrepreneur make a smart, data-driven decision.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Main CTAs - Enhanced with clearer purpose */}
         <main className="space-y-8 mb-16">
 
           {/* Primary CTA: Email Signup - Clear value */}
@@ -412,10 +475,10 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
             <CardHeader className="text-center pb-4">
               <div className="flex items-center justify-center gap-2 mb-2">
                 <Mail className="w-6 h-6 text-primary" />
-                <CardTitle className="text-2xl">Want This Built?</CardTitle>
+                <CardTitle className="text-2xl">Want This Built? Vote with Your Email</CardTitle>
               </div>
               <p className="text-muted-foreground">
-                Add your email to show demand. We'll notify you if it gets built.
+                Email signups = real demand signals. Show the creator this solves a problem for you.
               </p>
             </CardHeader>
             <CardContent>
@@ -423,15 +486,15 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
             </CardContent>
           </Card>
 
-          {/* Secondary CTA: Quick Feedback */}
+          {/* Secondary CTA: Quick Feedback with explanation */}
           <Card className="shadow-md">
             <CardHeader className="text-center pb-4">
               <div className="flex items-center justify-center gap-2 mb-2">
                 <MessageCircle className="w-6 h-6 text-primary" />
-                <CardTitle className="text-xl">Quick Feedback</CardTitle>
+                <CardTitle className="text-xl">Quick Market Feedback</CardTitle>
               </div>
               <p className="text-muted-foreground text-sm">
-                Help validate this idea with one click
+                Help the creator understand market appeal — your honest opinion guides smart decisions
               </p>
             </CardHeader>
             <CardContent>
@@ -440,33 +503,74 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
           </Card>
         </main>
 
+        {/* How This Works - Educational section */}
+        <div className="mb-12">
+          <Card className="bg-muted/30 border-border">
+            <CardHeader className="text-center">
+              <CardTitle className="text-lg">How This Validation Works</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-4 gap-4 text-sm">
+                <div className="text-center space-y-2">
+                  <div className="bg-primary text-primary-foreground w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold mx-auto">1</div>
+                  <div className="font-medium text-foreground">You see the idea</div>
+                  <div className="text-xs text-muted-foreground">Decide if you'd actually use it</div>
+                </div>
+                <div className="text-center space-y-2">
+                  <div className="bg-primary text-primary-foreground w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold mx-auto">2</div>
+                  <div className="font-medium text-foreground">Vote with your email</div>
+                  <div className="text-xs text-muted-foreground">Show real interest (not just browsing)</div>
+                </div>
+                <div className="text-center space-y-2">
+                  <div className="bg-primary text-primary-foreground w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold mx-auto">3</div>
+                  <div className="font-medium text-foreground">Creator gets data</div>
+                  <div className="text-xs text-muted-foreground">"15 signups = there's demand!"</div>
+                </div>
+                <div className="text-center space-y-2">
+                  <div className="bg-primary text-primary-foreground w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold mx-auto">4</div>
+                  <div className="font-medium text-foreground">Smart GO decision</div>
+                  <div className="text-xs text-muted-foreground">Build it with confidence</div>
+                </div>
+              </div>
+              <div className="text-center mt-6 p-3 bg-background rounded border-l-4 border-primary">
+                <p className="text-xs text-muted-foreground">
+                  <span className="font-medium text-foreground">Your email signup is a STRONG signal</span> that this solves a real problem for you.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Validation CTA - Clear business model */}
         <aside className="text-center mb-12">
           <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
             <CardContent className="py-6">
               <p className="text-muted-foreground mb-3">
-                <strong className="text-foreground">Got your own idea?</strong>
+                <strong className="text-foreground">Got your own idea to validate?</strong>
               </p>
               <a
                 href="/"
                 className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors font-medium"
               >
-                Start Testing Your Idea in 60 Seconds →
+                Create Your Validation Page in 60 Seconds →
               </a>
             </CardContent>
           </Card>
         </aside>
 
-        {/* Clean Footer */}
+        {/* Clean Footer with clear explanation */}
         <footer className="border-t pt-8 text-center space-y-4">
-          <div className="text-sm text-muted-foreground">
-            <p>
-              This is an <strong>idea validation test</strong> — not a real product yet.
+          <div className="text-sm text-muted-foreground space-y-2">
+            <p className="font-medium text-foreground">
+              Help an entrepreneur make a smart decision!
             </p>
-            <p className="text-xs mt-2">
+            <p>
+              If enough people show interest, the creator will confidently move forward with development. Your participation helps turn great ideas into great products.
+            </p>
+            <p className="text-xs mt-4">
               Powered by{' '}
               <a href="/" className="text-primary hover:underline font-medium">
-                IdeaPilot
+                GoNo-Go
               </a>
               {' '}— Turn any idea into a validation page in 60 seconds
             </p>

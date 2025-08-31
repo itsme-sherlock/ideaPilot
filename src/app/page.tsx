@@ -117,7 +117,7 @@ export default function Home() {
               1
             </div>
             <div>
-              <h3 className="font-semibold text-foreground">Share your idea</h3>
+              <h3 className="font-semibold text-foreground">Type your idea</h3>
               <p className="text-sm text-muted-foreground">
                 Something like: "AI course for busy parents" or "Local coffee delivery app"
               </p>
@@ -190,7 +190,7 @@ export default function Home() {
         </div>
 
         {/* Footer Trust Line */}
-        <Footer/>
+        <Footer needed={true} />
 
         {/* feedback */}
         <FeedbackFab slug={slug} />

@@ -1,4 +1,4 @@
-import { Footer } from '@/components/footer';
+
 
 export default function PageLayout({
   children,
@@ -10,7 +10,7 @@ export default function PageLayout({
       <main className="flex-grow">
         {children}
       </main>
-      <Footer />
+      
     </div>
   );
 }
