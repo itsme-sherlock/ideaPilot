@@ -44,6 +44,7 @@ type PageData = {
   headline: string;
   creator_email: string;
   idea: string;
+
 };
 
 type Signup = {
@@ -757,13 +758,14 @@ function getNudgeForStep(stepNumber: number, signups: Signup[], feedback: Feedba
 export default function AdminPage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; id: string }>;
 }) {
   const [data, setData] = useState<{
     page: PageData;
     signups: Signup[];
     feedback: Feedback[];
   } | null>(null);
+  // console.log("params=", params);
   const [loading, setLoading] = useState(true);
   const [slug, setSlug] = useState<string>("");
   const [showComingSoon, setShowComingSoon] = useState(false);
@@ -780,20 +782,25 @@ export default function AdminPage({
   const handleComingSoon = (featureName: string) => {
     setComingSoonFeature(featureName);
     setShowComingSoon(true);
+    console.log(`[handleComingSoon] featureName=${featureName}`);
   };
 
   const handleStepCompletion = (step: keyof typeof stepCompletions, checked: boolean) => {
     setStepCompletions(prev => ({ ...prev, [step]: checked }));
+    console.log(`[handleStepCompletion] set ${step} to ${checked}`);
   };
 
   useEffect(() => {
     async function loadData() {
       const resolvedParams = await params;
       setSlug(resolvedParams.slug);
+      console.log("Resolved params:", resolvedParams);
+      console.log(`[loadData] slug=${resolvedParams.slug}`);
 
       const result = await getAdminData(resolvedParams.slug);
       setData(result);
       setLoading(false);
+      console.log(`[loadData] result=${JSON.stringify(result)}`);
     }
 
     loadData();
@@ -827,7 +834,7 @@ export default function AdminPage({
   const hasAnyData = signups.length > 0 || feedback.length > 0;
   
   const publicUrl = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:9002"}/p/${slug}`;
-  const adminUrl = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:9002"}/p/${slug}/admin`;
+  const adminUrl = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:9002"}/p/${slug}/admin/${page.id}`;
 
   return (
     <div className="min-h-screen bg-background">
@@ -1113,6 +1120,7 @@ export default function AdminPage({
           </StepCard>
         </div>
 
+          {/* Step 4: Take Action + Coming Soon Features */}
         <FeedbackFab slug={slug} />
 
         {/* Coming Soon Modal */}

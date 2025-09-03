@@ -2,7 +2,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { getClientIp } from './get-ip';
 
-const WINDOW_MS = 60 * 60 * 1000; // 1 hour
+const WINDOW_MS = 60 * 60 * 0; // 1 hour
 const MAX_REQUESTS = 1;
 
 export async function rateLimit(): Promise<{ allowed: boolean; timeLeft?: number }> {
