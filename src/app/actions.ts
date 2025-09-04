@@ -139,7 +139,7 @@ export async function createLandingPage(values: z.infer<typeof createPageSchema>
     // This will ensure that the pages are rebuilt with the new data.
     console.log('Revalidating paths...' + `/p/${slug} and /p/${slug}/${insertedPage.id}`);
     revalidatePath(`/p/${slug}`);
-    revalidatePath(`/p/${slug}/${insertedPage.id}`);
+    // revalidatePath(`/p/${slug}/${insertedPage.id}`);
 
     // STEP 11: RETURN SLUG
     // Return the generated slug.
@@ -175,7 +175,7 @@ export async function addSignup(values: z.infer<typeof addSignupSchema>) {
 
     if (error) throw error;
 
-    revalidatePath(`/p/[slug]/admin/${pageId}`, 'page');
+    // revalidatePath(`/p/[slug]/admin/${pageId}`, 'page');
     return { success: 'Thank you for signing up!' };
   } catch (error: any) {
     console.error('Error adding signup:', error);
@@ -206,7 +206,7 @@ export async function addFeedback(values: z.infer<typeof addFeedbackSchema>) {
 
     if (error) throw error;
 
-    revalidatePath(`/p/[slug]/admin/${pageId}`, 'page');
+    // revalidatePath(`/p/[slug]/admin/${pageId}`, 'page');
     return { success: 'Thank you for your feedback!' };
   } catch (error: any) {
     console.error('Error adding feedback:', error);
