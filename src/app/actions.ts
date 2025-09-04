@@ -175,7 +175,7 @@ export async function addSignup(values: z.infer<typeof addSignupSchema>) {
 
     if (error) throw error;
 
-    revalidatePath(`/p/[slug]/admin`, 'page');
+    revalidatePath(`/p/[slug]/admin/${pageId}`, 'page');
     return { success: 'Thank you for signing up!' };
   } catch (error: any) {
     console.error('Error adding signup:', error);
@@ -206,7 +206,7 @@ export async function addFeedback(values: z.infer<typeof addFeedbackSchema>) {
 
     if (error) throw error;
 
-    revalidatePath(`/p/[slug]/admin`, 'page');
+    revalidatePath(`/p/[slug]/admin/${pageId}`, 'page');
     return { success: 'Thank you for your feedback!' };
   } catch (error: any) {
     console.error('Error adding feedback:', error);
