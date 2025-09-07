@@ -44,14 +44,14 @@ export function IdeaForm() {
           title: "Error",
           description: result.error,
         });
-      } else if (result.slug) {
+      } else if (result.slug && result.pageId) {
         toast({
           variant: "success",
           title: "Success!",
           description: "Success! Your page is live. Redirecting you to your dashboard... ",
         });
         setTimeout(() => {
-          router.push(`/p/${result.slug}/admin`);
+          router.push(`/p/${result.slug}/admin/${result.pageId}`);
         }, 1500); // 1.5 seconds delay before redirect
       }
     } catch (error) {

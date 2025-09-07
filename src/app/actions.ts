@@ -119,14 +119,15 @@ export async function createLandingPage(values: z.infer<typeof createPageSchema>
     // The landing page will contain the generated headline and sub-headline.
     console.log('Inserting landing page...');
     const now = new Date().toISOString();
-    const { error: insertError } = await supabase.from('pages').insert({
+    const { data : insertedPage, error: insertError } = await supabase.from('pages').insert({
       idea: productDescription,
       creator_email: email,
       headline,
       sub_headline: subHeadline,
       slug,
       created_at: now,
-    });
+    }).select('id,slug').single()
+    ;
 
     if (insertError) {
       console.error('Supabase insert error:', insertError);
@@ -136,14 +137,14 @@ export async function createLandingPage(values: z.infer<typeof createPageSchema>
     // STEP 10: REVALIDATE PATHS
     // Revalidate the paths for the landing page and admin page.
     // This will ensure that the pages are rebuilt with the new data.
-    console.log('Revalidating paths...');
+    console.log('Revalidating paths...' + `/p/${slug} and /p/${slug}/${insertedPage.id}`);
     revalidatePath(`/p/${slug}`);
-    revalidatePath(`/p/${slug}/admin`);
+    // revalidatePath(`/p/${slug}/${insertedPage.id}`);
 
     // STEP 11: RETURN SLUG
     // Return the generated slug.
     // The slug will be used to redirect the user to the landing page.
-    return { slug };
+    return { slug,pageId: insertedPage.id };
   } catch (error: any) {
     console.error('Error in createLandingPage:', error);
     return { error: 'An unexpected error occurred. Could not create landing page.' };
@@ -174,7 +175,7 @@ export async function addSignup(values: z.infer<typeof addSignupSchema>) {
 
     if (error) throw error;
 
-    revalidatePath(`/p/[slug]/admin`, 'page');
+    // revalidatePath(`/p/[slug]/admin/${pageId}`, 'page');
     return { success: 'Thank you for signing up!' };
   } catch (error: any) {
     console.error('Error adding signup:', error);
@@ -205,7 +206,7 @@ export async function addFeedback(values: z.infer<typeof addFeedbackSchema>) {
 
     if (error) throw error;
 
-    revalidatePath(`/p/[slug]/admin`, 'page');
+    // revalidatePath(`/p/[slug]/admin/${pageId}`, 'page');
     return { success: 'Thank you for your feedback!' };
   } catch (error: any) {
     console.error('Error adding feedback:', error);
